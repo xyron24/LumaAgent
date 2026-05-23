@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <DHT.h>
+#include "secrets.h"  // WiFi credentials — never commit this file. See secrets.h.example
 
 #define PIR D2
 #define RELAY D1
@@ -10,8 +11,8 @@
 
 DHT dht(DHTPIN, DHTTYPE);
 
-const char* ssid = "Vaibhav's Wifi";
-const char* password = "21345678";  
+const char* ssid        = WIFI_SSID;      // Defined in secrets.h
+const char* password    = WIFI_PASSWORD;  // Defined in secrets.h
 const char* mqtt_server = "dev.coppercloud.in";
 
 WiFiClient espClient;

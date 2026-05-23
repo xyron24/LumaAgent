@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LumaAgent — Smart Lighting Copilot</title>
+  <meta name="description" content="LLM-powered IoT operations dashboard. Control your smart lighting system and analyze sensor data using natural language." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- ── Background Effects ─────────────────────────────────────────────── -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- ── Main Layout ────────────────────────────────────────────────────── -->
+  <div class="app-shell">
+
+    <!-- ══ LEFT PANEL: Dashboard ══════════════════════════════════════════ -->
+    <aside class="panel panel-dashboard">
+
+      <!-- Header -->
+      <header class="dash-header">
+        <div class="dash-logo">
+          <span class="logo-icon">⚡</span>
+          <div class="logo-text">
+            <h1>LumaAgent</h1>
+            <p>Smart Lighting Copilot</p>
+          </div>
+        </div>
+        <div class="mqtt-status" id="mqtt-status">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="status-label">Connecting...</span>
+        </div>
+      </header>
+
+      <!-- Live Sensor Cards -->
+      <section class="section-label">
+        <span>LIVE SENSOR READINGS</span>
+        <span class="refresh-badge" id="last-refresh">--</span>
+      </section>
+
+      <div class="sensor-grid">
+
+        <div class="card card-temp" id="card-temp">
+          <div class="card-icon">🌡️</div>
+          <div class="card-body">
+            <div class="card-label">Temperature</div>
+            <div class="card-value" id="val-temp">--</div>
+            <div class="card-unit">°C</div>
+          </div>
+          <div class="card-sparkline" id="spark-temp"></div>
+        </div>
+
+        <div class="card card-hum" id="card-hum">
+          <div class="card-icon">💧</div>
+          <div class="card-body">
+            <div class="card-label">Humidity</div>
+            <div class="card-value" id="val-hum">--</div>
+            <div class="card-unit">%</div>
+          </div>
+          <div class="card-sparkline" id="spark-hum"></div>
+        </div>
+
+        <div class="card card-ldr" id="card-ldr">
+          <div class="card-icon">☀️</div>
+          <div class="card-body">
+            <div class="card-label">Light Intensity</div>
+            <div class="card-value" id="val-ldr">--</div>
+            <div class="card-unit">%</div>
+          </div>
+          <div class="card-bar-wrap">
+            <div class="card-bar" id="bar-ldr"></div>
+          </div>
+        </div>
+
+        <div class="card card-pir" id="card-pir">
+          <div class="card-icon">👁️</div>
+          <div class="card-body">
+            <div class="card-label">Motion</div>
+            <div class="card-value" id="val-pir">--</div>
+            <div class="card-unit">PIR</div>
+          </div>
+          <div class="pir-ring" id="pir-ring"></div>
+        </div>
+
+      </div>
+
+      <!-- Relay Control Card -->
+      <div class="relay-card" id="relay-card">
+        <div class="relay-left">
+          <div class="relay-label">RELAY STATE</div>
+          <div class="relay-value" id="val-relay">--</div>
+        </div>
+        <div class="relay-controls">
+          <button class="btn-relay btn-on"   id="btn-on"   onclick="quickRelay('Turn the light ON')">ON</button>
+          <button class="btn-relay btn-auto" id="btn-auto" onclick="quickRelay('Switch to AUTO mode')">AUTO</button>
+          <button class="btn-relay btn-off"  id="btn-off"  onclick="quickRelay('Turn the light OFF')">OFF</button>
+        </div>
+      </div>
+
+      <!-- Scheduled Actions -->
+      <section class="section-label" style="margin-top:1.5rem">
+        <span>SCHEDULED ACTIONS</span>
+      </section>
+      <div class="scheduled-list" id="scheduled-list">
+        <div class="no-scheduled">No pending scheduled actions</div>
+      </div>
+
+      <!-- Quick Prompts -->
+      <section class="section-label" style="margin-top:1.5rem">
+        <span>QUICK PROMPTS</span>
+      </section>
+      <div class="quick-prompts">
+        <button class="chip" onclick="quickRelay('What is the current temperature and humidity?')">🌡️ Current readings</button>
+        <button class="chip" onclick="quickRelay('How many times was motion detected today?')">👁️ Motion today</button>
+        <button class="chip" onclick="quickRelay('How long was the light ON in the last 24 hours?')">💡 Light usage</button>
+        <button class="chip" onclick="quickRelay('Turn off the light in 10 minutes')">⏱️ Off in 10 min</button>
+        <button class="chip" onclick="quickRelay('What was the average temperature today?')">📊 Avg temp today</button>
+        <button class="chip" onclick="quickRelay('Was there any motion detected while the light was manually ON?')">🔍 Waste check</button>
+      </div>
+
+    </aside>
+
+    <!-- ══ RIGHT PANEL: AI Chat ════════════════════════════════════════════ -->
+    <main class="panel panel-chat">
+
+      <!-- Chat Header -->
+      <header class="chat-header">
+        <div class="chat-agent-info">
+          <div class="agent-avatar">AI</div>
+          <div>
+            <div class="agent-name">LumaAgent Analyst</div>
+            <div class="agent-model">Powered by Gemini 2.5 Flash · Function Calling</div>
+          </div>
+        </div>
+        <button class="btn-clear" id="btn-clear" onclick="clearChat()">Clear</button>
+      </header>
+
+      <!-- Chat Messages -->
+      <div class="chat-messages" id="chat-messages">
+        <!-- Welcome message -->
+        <div class="msg msg-agent">
+          <div class="msg-avatar">AI</div>
+          <div class="msg-bubble">
+            <p>Hello! I'm <strong>LumaAgent</strong>, your intelligent IoT operations analyst powered by Gemini 2.5 Flash with real-time function calling.</p>
+            <p style="margin-top:0.5rem">I can:</p>
+            <ul style="margin:0.5rem 0 0 1rem; line-height:1.8">
+              <li>📡 Read <strong>live sensor data</strong> from your ESP8266</li>
+              <li>📊 Run <strong>SQL analytics</strong> on your historical database</li>
+              <li>💡 <strong>Control the relay</strong> (ON / OFF / AUTO)</li>
+              <li>⏱️ <strong>Schedule</strong> delayed commands</li>
+            </ul>
+            <p style="margin-top:0.75rem; opacity:0.7; font-size:0.8rem">Try the quick prompts on the left, or ask me anything.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input -->
+      <div class="chat-input-wrap">
+        <div class="tool-status" id="tool-status"></div>
+        <div class="chat-input-row">
+          <textarea
+            id="chat-input"
+            placeholder="Ask me anything about your IoT system..."
+            rows="1"
+            onkeydown="handleKey(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+          <button class="btn-send" id="btn-send" onclick="sendMessage()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

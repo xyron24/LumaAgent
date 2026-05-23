@@ -1,0 +1,20 @@
+# Arduino credentials — use secrets.h.example as template
+esp8266_code/secrets.h
+
+# Python backend credentials
+ai_agent/backend/.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db
