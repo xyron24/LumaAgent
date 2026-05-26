@@ -1,0 +1,22 @@
+{
+  "name": "lumaagent-backend-node",
+  "version": "1.0.0",
+  "description": "Node.js Express backend with Gemini GenAI SDK for LumaAgent IoT system",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "@google/genai": "^1.16.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mqtt": "^5.7.0",
+    "mysql2": "^3.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.3"
+  }
+}

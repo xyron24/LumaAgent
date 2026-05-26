@@ -1,12 +1,4 @@
-# Never commit the real .env — only .env.example goes to GitHub
+node_modules/
 .env
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-
-# Virtual environments
-venv/
-.venv/
-env/
+.DS_Store
+*.log
