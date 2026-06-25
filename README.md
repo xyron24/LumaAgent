@@ -25,6 +25,12 @@ This project replaces and extends that paradigm with an **LLM-powered agent** th
 
 ---
 
+## LumaAgent UI
+![UI](images/ui1.png)
+![UI](images/ui2.png)
+
+---
+
 ## Key Features
 
 ### Hardware Layer
